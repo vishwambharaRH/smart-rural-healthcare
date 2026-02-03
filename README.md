@@ -1,5 +1,11 @@
 # Smart Rural Healthcare Outreach Management System
 
+Team Members:
+- [Vineet Anil Sharma](https://github.com/VineetSharma05) (PES1UG23CS690)
+- [Vishruth Rallapalli](https://github.com/Vishy-55) (PES1UG23CS699)
+- [Vishwambhara R Hebbalalu](https://github.com/vishwambharaRH) (PES1UG23CS700)
+- [Vrishank N Amembal](https://github.com/vrishank-na) (PES1UG23CS705)
+
 ## Project Synopsis
 
 The **Smart Rural Healthcare Outreach Management System** is an object-oriented software solution designed to manage and streamline healthcare services in rural and remote areas. The system focuses on organizing health camps, managing patient records, coordinating healthcare personnel, and ensuring timely communication between patients, doctors, and health workers.
