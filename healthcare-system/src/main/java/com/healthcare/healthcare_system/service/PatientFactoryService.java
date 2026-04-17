@@ -11,9 +11,6 @@ public class PatientFactoryService {
 
     @Autowired
     private PatientRepository patientRepository;
-    
-    @Autowired
-    private UserService userService;
 
     public Patient createOrGetPatient(String username) {
         if (patientRepository.findByUsername(username).isPresent()) {

@@ -18,6 +18,10 @@ public class MedicineInventoryService {
         return medicineInventoryRepository.findAll();
     }
 
+    public MedicineInventory getMedicineById(Long id) {
+        return medicineInventoryRepository.findById(id).orElse(null);
+    }
+
     public List<MedicineInventory> getMedicinesBySpecialty(String specialty) {
         return medicineInventoryRepository.findBySpecialty(specialty);
     }

@@ -61,8 +61,12 @@ public class AppointmentController {
 
     @PostMapping("/appointments/reschedule")
     public String rescheduleAppointment(@ModelAttribute Appointment appointment, RedirectAttributes redirectAttributes) {
-        appointmentService.saveAppointment(appointment);
-        redirectAttributes.addFlashAttribute("message", "Appointment rescheduled successfully!");
+        Appointment rescheduled = appointmentService.rescheduleAppointment(appointment);
+        if (rescheduled != null) {
+            redirectAttributes.addFlashAttribute("message", "Appointment rescheduled successfully!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Failed to reschedule appointment!");
+        }
         return "redirect:/patient-dashboard";
     }
 

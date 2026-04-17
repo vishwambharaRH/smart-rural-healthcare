@@ -62,18 +62,13 @@
             <div class="col-lg-4">
                 <div class="card section-card">
                     <div class="card-header bg-primary text-white">
-                        <h5><i class="bi bi-capsule-pill"></i> Update Inventory</h5>
+                        <h5><i class="bi bi-capsule-pill"></i> Manage Inventory</h5>
                     </div>
-                    <div class="card-body">
-                        <h6>Quick Stock Update</h6>
-                        <div th:each="medicine : ${medicines}" class="mb-2">
-                            <small th:text="${medicine.medicineName}">Medicine</small>
-                            <input type="number" class="form-control form-control-sm" th:value="${medicine.quantity}" placeholder="Qty">
-                            <button class="btn btn-sm btn-outline-primary mt-1 w-100">Update</button>
-                        </div>
-                        <div th:if="${medicines.isEmpty()}">
-                            No medicines. <a href="#">Add new?</a>
-                        </div>
+                    <div class="card-body d-flex flex-column">
+                        <p>Manage medicine stock, expiry dates, and batch information.</p>
+                        <a href="/medicines" class="btn btn-primary w-100 mt-auto">
+                            <i class="bi bi-arrow-right"></i> Go to Inventory
+                        </a>
                     </div>
                 </div>
             </div>

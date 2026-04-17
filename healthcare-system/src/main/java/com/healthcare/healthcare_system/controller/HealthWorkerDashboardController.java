@@ -32,9 +32,6 @@ public class HealthWorkerDashboardController {
     @GetMapping("/healthworker-dashboard")
     @PreAuthorize("hasRole('HEALTHWORKER')")
     public String healthWorkerDashboard(Model model, Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
-
         model.addAttribute("medicines", medicineInventoryService.getAllMedicines());
         model.addAttribute("camps", campScheduleService.getAllCamps());
         model.addAttribute("patients", patientService.getAllPatients());
@@ -46,9 +43,6 @@ public class HealthWorkerDashboardController {
     @GetMapping("/healthworker-functionalities")
     @PreAuthorize("hasRole('HEALTHWORKER')")
     public String healthWorkerFunctionalities(Model model, Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
-
         model.addAttribute("newCamp", new CampSchedule());
         model.addAttribute("medicines", medicineInventoryService.getAllMedicines());
         model.addAttribute("patients", patientService.getAllPatients());
