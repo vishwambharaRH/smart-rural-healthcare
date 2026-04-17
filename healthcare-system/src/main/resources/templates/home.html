@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Smart Rural Healthcare System - Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .hero { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        .feature-card { transition: transform 0.3s; }
+        .feature-card:hover { transform: translateY(-10px); }
+    </style>
+</head>
+<body class="text-white">
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container mt-5 pt-5">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="hero p-5 rounded-4 text-center mb-5">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                        Smart Rural Healthcare System
+                    </h1>
+                    <p class="lead mb-4">Bridging healthcare gaps in rural India with technology. Doctors, healthworkers, and patients connected for better care.</p>
+                    <div class="d-flex gap-3 justify-content-center flex-wrap">
+                        <a href="/login" class="btn btn-primary btn-lg px-4">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                        <a href="/register" class="btn btn-outline-light btn-lg px-4">
+                            <i class="bi bi-person-plus"></i> Register
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1576091160399-1d65cdaa1bd5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" class="img-fluid rounded-4 shadow" alt="Rural Healthcare">
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2 class="text-center mb-5">Key Features</h2>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card card bg-dark text-white h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-person-heart display-4 text-primary"></i>
+                        <h5 class="card-title mt-3">Patient Management</h5>
+                        <p class="card-text">Track patient history, diagnosis, prescriptions, and village locations.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card card bg-dark text-white h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-calendar-check display-4 text-success"></i>
+                        <h5 class="card-title mt-3">Appointment Booking</h5>
+                        <p class="card-text">Easy scheduling with doctor availability and real-time status updates.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card card bg-dark text-white h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-geo-alt display-4 text-info"></i>
+                        <h5 class="card-title mt-3">Rural Health Camps</h5>
+                        <p class="card-text">Plan and track medical camps with doctor assignments and village coverage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <h2 class="mb-4">Role-Based Access</h2>
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <i class="bi bi-stethoscope display-6"></i>
+                                <h6>Doctors</h6>
+                                <small>Manage appointments, records, prescriptions</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <i class="bi bi-person-badge display-6"></i>
+                                <h6>Health Workers</h6>
+                                <small>Inventory, camps, patient outreach</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <i class="bi bi-person-heart display-6"></i>
+                                <h6>Patients</h6>
+                                <small>Book appointments, view records</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <i class="bi bi-shield-lock display-6"></i>
+                                <h6>Admin</h6>
+                                <small>Full system management</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-5 py-4 bg-dark text-white text-center">
+            <p>&copy; 2024 Smart Rural Healthcare System. Bringing healthcare to villages.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
