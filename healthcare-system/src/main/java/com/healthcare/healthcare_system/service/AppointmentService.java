@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import com.healthcare.healthcare_system.model.Appointment;
 import com.healthcare.healthcare_system.model.Status;
 import com.healthcare.healthcare_system.repository.AppointmentRepository;
-import com.healthcare.healthcare_system.repository.DoctorRepository;
-import com.healthcare.healthcare_system.repository.PatientRepository;
 
 @Service
 public class AppointmentService {
@@ -17,18 +15,12 @@ public class AppointmentService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
-    @Autowired
-    private PatientRepository patientRepository;
-
-    @Autowired
-    private DoctorRepository doctorRepository;
-
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
 
-    public void saveAppointment(Appointment appointment) {
-        appointmentRepository.save(appointment);
+    public Appointment saveAppointment(Appointment appointment) {
+        return appointmentRepository.save(appointment);
     }
 
     public Appointment getAppointmentById(Long id) {
@@ -36,7 +28,23 @@ public class AppointmentService {
     }
 
     public void deleteAppointment(Long id) {
-        appointmentRepository.deleteById(id);
+        Appointment appointment = appointmentRepository.findById(id).orElse(null);
+        if (appointment != null) {
+            appointment.setStatus(Status.CANCELLED);
+            appointmentRepository.save(appointment);
+        }
+    }
+
+    public Appointment rescheduleAppointment(Appointment appointment) {
+        Appointment existing = appointmentRepository.findById(appointment.getId()).orElse(null);
+        if (existing != null) {
+            existing.setAppointmentDate(appointment.getAppointmentDate());
+            existing.setReason(appointment.getReason());
+            // Keep the status as PENDING for rescheduled appointments
+            existing.setStatus(Status.PENDING);
+            return appointmentRepository.save(existing);
+        }
+        return null;
     }
 
     public List<Appointment> getAppointmentsByPatientUsername(String username) {

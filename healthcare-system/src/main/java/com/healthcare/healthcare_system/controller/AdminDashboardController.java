@@ -16,8 +16,6 @@ import com.healthcare.healthcare_system.service.MedicineInventoryService;
 import com.healthcare.healthcare_system.service.CampScheduleService;
 import com.healthcare.healthcare_system.repository.UserRepository;
 
-import java.util.List;
-
 @Controller
 public class AdminDashboardController {
 

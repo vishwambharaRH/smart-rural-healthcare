@@ -84,8 +84,8 @@
                                     <td th:text="${appointment.reason}"></td>
                                     <td>Confirmed</td>
                                     <td>
-                                        <a href="/appointments/cancel/${appointment.id}" class="btn btn-danger btn-sm">Cancel</a>
-                                        <a href="/appointments/reschedule/${appointment.id}" class="btn btn-warning btn-sm">Reschedule</a>
+                                        <a th:href="@{/appointments/cancel/{id}(id=${appointment.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this appointment?')">Cancel</a>
+                                        <a th:href="@{/appointments/reschedule/{id}(id=${appointment.id})}" class="btn btn-warning btn-sm">Reschedule</a>
                                     </td>
                                 </tr>
                             </tbody>
