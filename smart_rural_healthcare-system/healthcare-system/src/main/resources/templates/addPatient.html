@@ -1,0 +1,27 @@
+s<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Patient</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; }
+        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Add New Patient</h1>
+    <form th:object="${patient}" th:action="@{/patients/doctor/add}" method="post">
+
+
+        <input type="text" th:field="*{name}" placeholder="Name" required>
+        <input type="number" th:field="*{age}" placeholder="Age" required>
+        <input type="text" th:field="*{gender}" placeholder="Gender (M/F)" required>
+        <input type="text" th:field="*{village}" placeholder="Village" required>
+        <input type="text" th:field="*{phone}" placeholder="Phone">
+        <textarea th:field="*{diagnosis}" placeholder="Diagnosis" rows="4"></textarea>
+        <button type="submit">Save Patient</button>
+    </form>
+    <a href="/doctor-dashboard" class="btn btn-secondary">Back to Dashboard</a>
+</body>
+</html>
