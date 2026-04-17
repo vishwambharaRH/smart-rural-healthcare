@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Health Worker Dashboard - Smart Rural Healthcare</title>
+    <meta charset="utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); min-height: 100vh; }
+        .card { border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container mt-5 pt-4">
+        <h1 class="text-success mb-4">
+            <i class="bi bi-shield-heart"></i> Health Worker Dashboard
+        </h1>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+<h5><i class="bi bi-people-heart"></i> Health Worker Panel</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Manage rural healthcare camps, health workers, and emergency response.</p>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center bg-primary text-white">
+                                    <div class="card-body">
+                                        <i class="bi bi-inject bi-3x"></i>
+                                        <h5 th:text="${#lists.size(medicines)} + ' Medicines'">0 Items</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center bg-success text-white">
+                                    <div class="card-body">
+                                        <i class="bi bi-calendar2-week bi-3x"></i>
+                                        <h5 th:text="${#lists.size(camps)} + ' Camps'">0 Camps</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center bg-info text-white">
+                                    <div class="card-body">
+                                        <i class="bi bi-people bi-3x"></i>
+                                        <h5 th:text="${#lists.size(patients)} + ' Patients'">0 Patients</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center bg-warning text-white">
+                                    <div class="card-body">
+                                        <i class="bi bi-graph-up-arrow bi-3x"></i>
+                                        <h5 th:text="${#lists.size(appointments)} + ' Appointments'">0 Appointments</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="/inventory" class="btn btn-primary w-100 mb-2">Manage Inventory</a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="/camps" class="btn btn-success w-100 mb-2">View Camps</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Camps Table -->
+                        <h5 class="mt-4 mb-3"><i class="bi bi-calendar-range"></i> Upcoming Camps</h5>
+                        <div th:if="${camps.isEmpty()}">No camps scheduled.</div>
+                        <div th:unless="${camps.isEmpty()}" class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Village</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Doctor</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="camp : ${camps}">
+                                        <td th:text="${camp.village}"></td>
+                                        <td th:text="${camp.campDate}"></td>
+                                        <td th:text="${camp.startTime} + ' - ' + ${camp.endTime}"></td>
+                                        <td th:text="${camp.doctor?.name ?: 'TBA'}"></td>
+                                        <td><span class="badge bg-info" th:text="${camp.status}"></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Medicine Inventory Table -->
+                        <h5 class="mt-5 mb-3"><i class="bi bi-capsule-pill"></i> Medical Inventory</h5>
+                        <div th:if="${medicines.isEmpty()}">No medicines in inventory.</div>
+                        <div th:unless="${medicines.isEmpty()}" class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Medicine</th>
+                                        <th>Quantity</th>
+                                        <th>Expiry</th>
+                                        <th>S</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="medicine : ${medicines}">
+                                        <td th:text="${medicine.medicineName}"></td>
+                                        <td th:text="${medicine.quantity}">
+                                            <span th:if="${medicine.quantity < 10}" class="badge bg-danger">Low Stock</span>
+                                        </td>
+                                        <td th:text="${medicine.expiryDate}"></td>
+                                        <td th:text="${medicine.specialty}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Customer Care / Patients -->
+                        <h5 class="mt-5 mb-3"><i class="bi bi-telephone"></i> Customer Care - Patients</h5>
+                        <div th:if="${patients.isEmpty()}">No patients registered.</div>
+                        <div th:unless="${patients.isEmpty()}" class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Village</th>
+                                        <th>Phone</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="patient : ${patients}">
+                                        <td th:text="${patient.name}"></td>
+                                        <td th:text="${patient.village}"></td>
+                                        <td th:text="${patient.phone}"></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-success" onclick="copyToClipboard('${patient.phone}')">
+                                                <i class="bi bi-telephone-copy"></i> Call
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/healthworker-dashboard.js"></script>
+</body>
+</html>
+
+
