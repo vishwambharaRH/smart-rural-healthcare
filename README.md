@@ -100,6 +100,18 @@ Rural healthcare often suffers from fragmented record-keeping, poor coordination
 - The system shall follow modular object-oriented design
 - Classes shall be loosely coupled and highly cohesive
 
+## Quick Start
+
+The runnable Spring Boot application is in `smart_rural_healthcare-system/healthcare-system`.
+
+```bash
+cd smart_rural_healthcare-system/healthcare-system
+chmod +x mvnw
+./mvnw spring-boot:run
+```
+
+The app is configured to start on `http://localhost:8084/`.
+
 ---
 
 ## Classes and Their Responsibilities
@@ -154,4 +166,3 @@ Rural healthcare often suffers from fragmented record-keeping, poor coordination
 
 ### ReportGenerator
 - Methods: generatePatientReport(), generateCampReport()
-
