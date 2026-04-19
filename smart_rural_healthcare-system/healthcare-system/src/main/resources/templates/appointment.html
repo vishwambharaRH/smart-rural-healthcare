@@ -10,11 +10,11 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" th:href="@{/dashboard}">
                 <i class="bi bi-heart-pulse"></i> Rural Health
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/">Patients</a>
+                <a class="nav-link" th:href="@{/dashboard}">Patients</a>
                 <a class="nav-link" href="/doctors">Doctors</a>
                 <a class="nav-link active" href="/appointments">Appointments</a>
             </div>
@@ -31,7 +31,7 @@
                     </a>
                 </div>
 
-                <div th:if="${listAppointments.isEmpty}">
+                <div th:if="${#lists.isEmpty(listAppointments)}">
                     <div class="alert alert-info">
                         <i class="bi bi-calendar-x"></i> No appointments scheduled. <a href="/appointments/new">Schedule first appointment</a>
                     </div>
@@ -41,7 +41,7 @@
                     <table class="table table-hover" th:if="${not #lists.isEmpty(listAppointments)}">
                         <thead class="table-dark">
                             <tr>
-                                    <span th:text="${appointment.doctor.name + ' (' + appointment.doctor.specialty + ')'}">
+                                <th>ID</th>
                                 <th>Patient</th>
                                 <th>Doctor</th>
                                 <th>Date</th>
@@ -52,14 +52,10 @@
                         <tbody>
                             <tr th:each="appointment : ${listAppointments}">
                                 <td th:text="${appointment.id}"></td>
-                                <td>
-                                    <span th:text="${appointment.patient.name}"></span>
-                                </td>
-                                <td>
-                                        <span th:text="${appointment.doctor.name + ' (' + appointment.doctor.specialty + ')'}"></span>
-                                </td>
-                                <td th:text="${appointment.appointmentDate}"></td>
-                                <td th:text="${appointment.reason}"></td>
+                                <td th:text="${appointment.patient != null ? appointment.patient.name : 'N/A'}"></td>
+                                <td th:text="${appointment.doctor != null ? appointment.doctor.name + ' (' + appointment.doctor.specialty + ')' : 'N/A'}"></td>
+                                <td th:text="${appointment.appointmentDate != null ? appointment.appointmentDate : 'N/A'}"></td>
+                                <td th:text="${appointment.reason != null and !appointment.reason.isBlank() ? appointment.reason : 'N/A'}"></td>
                                 <td>
                                     <a th:href="@{/appointments/edit/{id}(id=${appointment.id})}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i>

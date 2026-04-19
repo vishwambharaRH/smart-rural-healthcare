@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.healthcare.healthcare_system.model.Appointment;
+import com.healthcare.healthcare_system.model.Status;
 
 import com.healthcare.healthcare_system.service.AppointmentService;
 import com.healthcare.healthcare_system.service.DoctorService;
@@ -66,10 +67,11 @@ public String rescheduleAppointment(@ModelAttribute Appointment appointment, Red
 
     existing.setAppointmentDate(appointment.getAppointmentDate());
     existing.setReason(appointment.getReason());
+    existing.setStatus(Status.PENDING);
 
     appointmentService.saveAppointment(existing);
 
-    redirectAttributes.addFlashAttribute("message", "Appointment rescheduled successfully!");
+    redirectAttributes.addFlashAttribute("message", "Appointment rescheduled and set to pending approval.");
     return "redirect:/patient-dashboard";
 }
 
@@ -78,6 +80,44 @@ public String rescheduleAppointment(@ModelAttribute Appointment appointment, Red
         Appointment appointment = appointmentService.getAppointmentById(id);
         model.addAttribute("appointment", appointment);
         return "rescheduleAppointment";
+    }
+
+    @GetMapping("/appointments/{id}/approve")
+    public String approveAppointment(
+            @PathVariable Long id,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        boolean updated = appointmentService.updateAppointmentStatusForDoctor(
+                id,
+                authentication.getName(),
+                Status.APPROVED);
+
+        if (updated) {
+            redirectAttributes.addFlashAttribute("message", "Appointment approved successfully!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Unable to approve appointment.");
+        }
+
+        return "redirect:/doctor-dashboard";
+    }
+
+    @GetMapping("/appointments/{id}/reject")
+    public String rejectAppointment(
+            @PathVariable Long id,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        boolean updated = appointmentService.updateAppointmentStatusForDoctor(
+                id,
+                authentication.getName(),
+                Status.REJECTED);
+
+        if (updated) {
+            redirectAttributes.addFlashAttribute("message", "Appointment rejected successfully!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Unable to reject appointment.");
+        }
+
+        return "redirect:/doctor-dashboard";
     }
 
     @GetMapping("/appointments/{id}")

@@ -52,7 +52,54 @@
                     </div>
                     <div class="card-body">
 <a href="/patients/doctor/add" class="btn btn-success w-100 mb-2">Add Patient</a>
-                        <a href="/appointments" class="btn btn-info w-100">View Appointments</a>
+                        <a href="/appointments" class="btn btn-info w-100">View All Appointments</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Appointments Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="bi bi-calendar-check"></i> All Your Appointments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(allAppointments)}" class="text-muted">
+                            <p>No appointments booked yet.</p>
+                        </div>
+                        <div th:if="${not #lists.isEmpty(allAppointments)}" class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Patient Name</th>
+                                        <th>Username</th>
+                                        <th>Phone</th>
+                                        <th>Village</th>
+                                        <th>Date</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="appointment : ${allAppointments}">
+                                        <td th:text="${appointment.patient?.name ?: 'N/A'}"></td>
+                                        <td th:text="${appointment.patient?.username ?: 'N/A'}"></td>
+                                        <td th:text="${appointment.patient?.phone ?: 'N/A'}"></td>
+                                        <td th:text="${appointment.patient?.village ?: 'N/A'}"></td>
+                                        <td th:text="${appointment.appointmentDate}"></td>
+                                        <td th:text="${appointment.reason ?: 'No reason specified'}"></td>
+                                        <td>
+                                            <span th:if="${appointment.status == 'PENDING'}" class="badge bg-warning">PENDING</span>
+                                            <span th:if="${appointment.status == 'APPROVED'}" class="badge bg-success">APPROVED</span>
+                                            <span th:if="${appointment.status == 'REJECTED'}" class="badge bg-danger">REJECTED</span>
+                                            <span th:if="${appointment.status == 'CANCELLED'}" class="badge bg-secondary">CANCELLED</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

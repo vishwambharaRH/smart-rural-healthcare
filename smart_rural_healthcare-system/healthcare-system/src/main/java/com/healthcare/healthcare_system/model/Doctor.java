@@ -25,7 +25,7 @@ public class Doctor {
     private String phone;
     private String hospital;
     private String geoLocation;
-    private boolean available;
+    private boolean available = true;
 }
 
 

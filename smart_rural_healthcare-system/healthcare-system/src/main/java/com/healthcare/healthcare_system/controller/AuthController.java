@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.healthcare.healthcare_system.model.User;
 import com.healthcare.healthcare_system.model.Patient;
+import com.healthcare.healthcare_system.model.Doctor;
 import com.healthcare.healthcare_system.service.UserService;
 import com.healthcare.healthcare_system.service.PatientService;
+import com.healthcare.healthcare_system.service.DoctorService;
 
 @Controller
 public class AuthController {
@@ -20,6 +22,9 @@ public class AuthController {
 
     @Autowired
     private PatientService patientService;
+
+    @Autowired
+    private DoctorService doctorService;
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -56,6 +61,20 @@ public class AuthController {
                 patient.setUsername(user.getUsername());
 
                 patientService.savePatient(patient);
+            }
+        }
+
+        // If registered as Doctor, create doctor profile
+        if (user.getRole() == User.Role.DOCTOR) {
+            if (doctorService.getDoctorByUsername(user.getUsername()) == null) {
+                Doctor doctor = new Doctor();
+                doctor.setUsername(user.getUsername());
+                doctor.setName(user.getName());
+                doctor.setPhone(user.getPhone());
+                doctor.setAvailable(true);  // Default availability = true
+                doctor.setSpecialty("General");  // Default specialty
+                doctor.setHospital("Not Provided");  // User can update later
+                doctorService.saveDoctor(doctor);
             }
         }
 

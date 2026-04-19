@@ -39,7 +39,7 @@ public class DoctorDashboardController {
         Doctor doctor = doctorService.getDoctorByUsername(username);
         model.addAttribute("doctor", doctor);
         model.addAttribute("pendingAppointments", appointmentService.getPendingAppointmentsByDoctorUsername(username));
-        model.addAttribute("appointments", appointmentService.getAllAppointments());
+        model.addAttribute("allAppointments", appointmentService.getAppointmentsByDoctorUsername(username));
         
         return "doctor-dashboard";
     }
