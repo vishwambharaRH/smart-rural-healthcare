@@ -11,8 +11,12 @@ import com.healthcare.healthcare_system.service.MedicineInventoryService;
 import com.healthcare.healthcare_system.service.PatientService;
 import com.healthcare.healthcare_system.service.AppointmentService;
 import com.healthcare.healthcare_system.service.CampScheduleService;
+import com.healthcare.healthcare_system.service.PrescriptionGeneratorService;
 import com.healthcare.healthcare_system.config.CustomUserDetails;
 import com.healthcare.healthcare_system.model.CampSchedule;
+import com.healthcare.healthcare_system.model.MedicineInventory;
+
+import java.util.Optional;
 
 @Controller
 public class HealthWorkerDashboardController {
@@ -28,6 +32,9 @@ public class HealthWorkerDashboardController {
 
     @Autowired
     private CampScheduleService campScheduleService;
+
+    @Autowired
+    private PrescriptionGeneratorService prescriptionGeneratorService;
 
     private void loadCommonData(Model model) {
         model.addAttribute("medicines", medicineInventoryService.getAllMedicines());

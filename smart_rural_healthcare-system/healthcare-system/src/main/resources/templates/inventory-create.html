@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Medicine - Smart Rural Healthcare</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-heart-pulse"></i> Rural Health
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/inventory/dashboard">Dashboard</a>
+                <a class="nav-link" href="/inventory/list">Inventory</a>
+                <a class="nav-link" href="/prescription/list">Prescriptions</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="bi bi-plus-circle"></i> Add New Medicine
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/inventory/create">
+                            <div class="mb-3">
+                                <label for="medicineName" class="form-label">Medicine Name</label>
+                                <input type="text" name="medicineName" class="form-control" id="medicineName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="batchNumber" class="form-label">Batch Number</label>
+                                <input type="text" name="batchNumber" class="form-control" id="batchNumber" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="expiryDate" class="form-label">Expiry Date</label>
+                                <input type="date" name="expiryDate" class="form-control" id="expiryDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">Quantity</label>
+                                <input type="number" name="quantity" class="form-control" id="quantity" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location (Village/Camp)</label>
+                                <input type="text" name="location" class="form-control" id="location" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="specialty" class="form-label">Specialty (Optional)</label>
+                                <select name="specialty" class="form-select" id="specialty">
+                                    <option value="">Select specialty</option>
+                                    <option value="General">General</option>
+                                    <option value="Cardiology">Cardiology</option>
+                                    <option value="Pediatrics">Pediatrics</option>
+                                    <option value="Orthopedics">Orthopedics</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="costPerUnit" class="form-label">Cost per Unit (Optional)</label>
+                                <input type="number" name="costPerUnit" class="form-control" id="costPerUnit" step="0.01" min="0">
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> Add Medicine
+                                </button>
+                                <a href="/inventory/list" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
