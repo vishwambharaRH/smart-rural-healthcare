@@ -170,7 +170,12 @@
                             <td th:text="${appointment.appointmentDate}"></td>
                             <td th:text="${appointment.doctor.name}"></td>
                             <td th:text="${appointment.reason}"></td>
-                            <td>Confirmed</td>
+                            <td>
+                                <span th:with="status=${appointment.status != null ? appointment.status.toString() : 'UNKNOWN'}"
+                                      th:class="${'badge ' + (status == 'PENDING' ? 'bg-warning text-dark' : (status == 'APPROVED' ? 'bg-success' : (status == 'REJECTED' ? 'bg-danger' : 'bg-secondary')))}"
+                                      th:text="${status == 'APPROVED' ? 'CONFIRMED' : status}">
+                                </span>
+                            </td>
 
                             <td>
 

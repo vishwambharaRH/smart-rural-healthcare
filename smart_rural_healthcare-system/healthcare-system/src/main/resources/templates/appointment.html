@@ -10,11 +10,11 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" th:href="@{/dashboard}">
                 <i class="bi bi-heart-pulse"></i> Rural Health
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/">Patients</a>
+                <a class="nav-link" th:href="@{/dashboard}">Patients</a>
                 <a class="nav-link" href="/doctors">Doctors</a>
                 <a class="nav-link active" href="/appointments">Appointments</a>
             </div>
@@ -31,7 +31,7 @@
                     </a>
                 </div>
 
-                <div th:if="${listAppointments.isEmpty}">
+                <div th:if="${#lists.isEmpty(listAppointments)}">
                     <div class="alert alert-info">
                         <i class="bi bi-calendar-x"></i> No appointments scheduled. <a href="/appointments/new">Schedule first appointment</a>
                     </div>

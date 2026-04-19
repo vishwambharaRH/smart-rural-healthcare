@@ -12,5 +12,6 @@ import com.healthcare.healthcare_system.model.Status;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     List<Appointment> findByPatientUsername(String username);
     List<Appointment> findByDoctorUsernameAndStatus(String username, Status status);
+    List<Appointment> findByDoctorUsername(String username);
 }
 

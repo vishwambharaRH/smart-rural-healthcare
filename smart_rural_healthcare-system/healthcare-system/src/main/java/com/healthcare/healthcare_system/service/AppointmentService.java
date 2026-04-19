@@ -1,6 +1,7 @@
 package com.healthcare.healthcare_system.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,25 @@ public class AppointmentService {
 
     public List<Appointment> getPendingAppointmentsByDoctorUsername(String username) {
         return appointmentRepository.findByDoctorUsernameAndStatus(username, Status.PENDING);
+    }
+
+    public List<Appointment> getAppointmentsByDoctorUsername(String username) {
+        return appointmentRepository.findByDoctorUsername(username);
+    }
+
+    public boolean updateAppointmentStatusForDoctor(Long appointmentId, String doctorUsername, Status newStatus) {
+        Appointment appointment = getAppointmentById(appointmentId);
+        if (appointment == null || appointment.getDoctor() == null) {
+            return false;
+        }
+
+        if (!Objects.equals(appointment.getDoctor().getUsername(), doctorUsername)) {
+            return false;
+        }
+
+        appointment.setStatus(newStatus);
+        appointmentRepository.save(appointment);
+        return true;
     }
 }
 

@@ -10,11 +10,11 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" th:href="@{/dashboard}">
                 <i class="bi bi-heart-pulse"></i> Rural Health
             </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/">Patients</a>
+                <a class="nav-link" th:href="@{/dashboard}">Patients</a>
                 <a class="nav-link" href="/doctors">Doctors</a>
                 <a class="nav-link" href="/appointments">Appointments</a>
             </div>
@@ -47,6 +47,10 @@
                             <div class="mb-3">
                                 <label for="hospital" class="form-label">Hospital/Clinic</label>
                                 <input type="text" th:field="*{hospital}" class="form-control" id="hospital" required>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" th:field="*{available}" class="form-check-input" id="available" checked>
+                                <label for="available" class="form-check-label">Available for appointments</label>
                             </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">
