@@ -28,7 +28,7 @@
                                         <option value="">Select Doctor</option>
                                         <option th:each="doctor : ${doctors}" 
                                                 th:value="${doctor.id}" 
-                                                th:text="${doctor.name} + ' (' + ${doctor.specialty} + ')'">
+                                            th:text="${doctor.name + ' (' + doctor.specialty + ')'}">
                                         </option>
                                     </select>
                                 </div>

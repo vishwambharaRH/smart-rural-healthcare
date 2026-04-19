@@ -127,11 +127,11 @@
                         <div th:each="doctor : ${doctors}">
                             <div class="d-flex align-items-center p-3 border-bottom">
                                 <div>
-                                    <h6 th:text="${doctor.name} + ' - ' + ${doctor.specialty}"></h6>
+                                            <h6 th:text="${doctor.name + ' - ' + doctor.specialty}"></h6>
                                     <small th:text="${doctor.phone}"></small>
                                 </div>
                                 <div class="ms-auto">
-                                    <a th:href="@{/appointments/new?doctorId=${doctor.id}}" class="btn btn-sm btn-primary">Book</a>
+                                            <a th:href="@{/appointments/new(doctorId=${doctor.id})}" class="btn btn-sm btn-primary">Book</a>
                                 </div>
                             </div>
                         </div>

@@ -2,7 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org" th:fragment="navbar">
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="/">
+    <a class="navbar-brand fw-bold" th:if="${#authentication == null or #authentication.name == null}" href="/">
+      <i class="bi bi-heart-pulse"></i> RuralCare
+    </a>
+    <a class="navbar-brand fw-bold" th:if="${#authentication != null and #authentication.name != null}" th:href="@{/dashboard}">
       <i class="bi bi-heart-pulse"></i> RuralCare
     </a>
     
@@ -13,7 +16,8 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" th:href="@{/}">Home</a>
+          <a class="nav-link" th:if="${#authentication == null or #authentication.name == null}" th:href="@{/}">Home</a>
+          <a class="nav-link" th:if="${#authentication != null and #authentication.name != null}" th:href="@{/dashboard}">Home</a>
         </li>
       </ul>
       

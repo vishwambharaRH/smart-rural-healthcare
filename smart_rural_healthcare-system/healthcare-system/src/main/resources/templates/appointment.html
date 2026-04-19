@@ -41,7 +41,7 @@
                     <table class="table table-hover" th:if="${not #lists.isEmpty(listAppointments)}">
                         <thead class="table-dark">
                             <tr>
-                                <th>ID</th>
+                                    <span th:text="${appointment.doctor.name + ' (' + appointment.doctor.specialty + ')'}">
                                 <th>Patient</th>
                                 <th>Doctor</th>
                                 <th>Date</th>
@@ -56,7 +56,7 @@
                                     <span th:text="${appointment.patient.name}"></span>
                                 </td>
                                 <td>
-                                    <span th:text="${appointment.doctor.name} + ' (' + ${appointment.doctor.specialty} + ')'"></span>
+                                        <span th:text="${appointment.doctor.name + ' (' + appointment.doctor.specialty + ')'}"></span>
                                 </td>
                                 <td th:text="${appointment.appointmentDate}"></td>
                                 <td th:text="${appointment.reason}"></td>

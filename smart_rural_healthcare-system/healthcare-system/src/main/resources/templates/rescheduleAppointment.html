@@ -25,7 +25,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Doctor</label>
-                                    <input type="text" th:value="${appointment.doctor.name} + ' (' + ${appointment.doctor.specialty} + ')'" class="form-control" readonly />
+                                        <input type="text" th:value="${appointment.doctor.name + ' (' + appointment.doctor.specialty + ')'}" class="form-control" readonly />
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">New Date & Time</label>
