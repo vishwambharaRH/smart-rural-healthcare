@@ -41,11 +41,12 @@
                     <table class="table table-hover" th:if="${not #lists.isEmpty(listAppointments)}">
                         <thead class="table-dark">
                             <tr>
-                                    <span th:text="${appointment.doctor.name + ' (' + appointment.doctor.specialty + ')'}">
+                                <th>ID</th>
                                 <th>Patient</th>
                                 <th>Doctor</th>
                                 <th>Date</th>
                                 <th>Reason</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -53,20 +54,35 @@
                             <tr th:each="appointment : ${listAppointments}">
                                 <td th:text="${appointment.id}"></td>
                                 <td>
-                                    <span th:text="${appointment.patient.name}"></span>
+                                    <strong th:text="${appointment.patient.name}"></strong>
+                                    <br><small class="text-muted" th:text="${appointment.patient.village}"></small>
                                 </td>
                                 <td>
-                                        <span th:text="${appointment.doctor.name + ' (' + appointment.doctor.specialty + ')'}"></span>
+                                    <strong th:text="${appointment.doctor.name}"></strong>
+                                    <br><small class="text-muted" th:text="${appointment.doctor.specialty}"></small>
                                 </td>
                                 <td th:text="${appointment.appointmentDate}"></td>
                                 <td th:text="${appointment.reason}"></td>
                                 <td>
-                                    <a th:href="@{/appointments/edit/{id}(id=${appointment.id})}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a th:href="@{/appointments/{id}(id=${appointment.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                    <span class="badge" 
+                                          th:text="${appointment.status}"
+                                          th:classappend="${appointment.status == 'APPROVED' ? 'bg-success' : appointment.status == 'PENDING' ? 'bg-warning' : 'bg-danger'}"></span>
+                                </td>
+                                <td>
+                                    <div class="btn-group-vertical btn-group-sm w-100" role="group">
+                                        <a th:href="@{/appointments/edit/{id}(id=${appointment.id})}" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <a th:href="@{/prescription/create-from-appointment/{id}(id=${appointment.id})}" class="btn btn-outline-success btn-sm" title="Generate prescription for this patient">
+                                            <i class="bi bi-file-earmark-pdf"></i> Rx
+                                        </a>
+                                        <a th:href="@{/reports/patient/{id}/download(id=${appointment.patient.id})}" class="btn btn-outline-info btn-sm" title="Download patient report">
+                                            <i class="bi bi-download"></i> Report
+                                        </a>
+                                        <a th:href="@{/appointments/{id}(id=${appointment.id})}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure?')">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

@@ -1,0 +1,301 @@
+package com.healthcare.healthcare_system.service;
+
+import com.healthcare.healthcare_system.model.*;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ReportService {
+
+    @Autowired
+    private PrescriptionService prescriptionService;
+
+    @Autowired
+    private AppointmentService appointmentService;
+
+    @Autowired
+    private MedicineInventoryService medicineInventoryService;
+
+    @Autowired
+    private PatientService patientService;
+
+    /**
+     * Generate prescription PDF
+     */
+    public byte[] generatePrescriptionPDF(Long prescriptionId) {
+        Optional<Prescription> prescriptionOpt = prescriptionService.getPrescriptionById(prescriptionId);
+        if (prescriptionOpt.isEmpty()) {
+            return new byte[0];
+        }
+
+        Prescription prescription = prescriptionOpt.get();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            // Header
+            Paragraph header = new Paragraph("PRESCRIPTION", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20));
+            header.setAlignment(Element.ALIGN_CENTER);
+            document.add(header);
+
+            Paragraph subtitle = new Paragraph("Smart Rural Healthcare System", 
+                    FontFactory.getFont(FontFactory.HELVETICA, 12));
+            subtitle.setAlignment(Element.ALIGN_CENTER);
+            document.add(subtitle);
+
+            Paragraph timestamp = new Paragraph("Generated on: " + LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+                    FontFactory.getFont(FontFactory.HELVETICA, 10));
+            timestamp.setAlignment(Element.ALIGN_CENTER);
+            document.add(timestamp);
+
+            document.add(new Paragraph("\n"));
+
+            // Prescription Details
+            if (prescription.getDiagnosis() != null && prescription.getDiagnosis().getMedicalRecord() != null) {
+                Appointment appointment = prescription.getDiagnosis().getMedicalRecord().getAppointment();
+                if (appointment != null) {
+                    Patient patient = appointment.getPatient();
+                    Doctor doctor = appointment.getDoctor();
+
+                    Paragraph patientTitle = new Paragraph("PATIENT INFORMATION", 
+                            FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+                    document.add(patientTitle);
+                    document.add(new Paragraph("Name: " + (patient != null ? patient.getName() : "N/A")));
+                    document.add(new Paragraph("Age: " + (patient != null ? patient.getAge() : "N/A")));
+                    document.add(new Paragraph("Village: " + (patient != null ? patient.getVillage() : "N/A")));
+                    document.add(new Paragraph("Phone: " + (patient != null ? patient.getPhone() : "N/A")));
+
+                    document.add(new Paragraph("\n"));
+
+                    Paragraph doctorTitle = new Paragraph("DOCTOR INFORMATION",
+                            FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+                    document.add(doctorTitle);
+                    document.add(new Paragraph("Doctor: " + (doctor != null ? doctor.getName() : "N/A")));
+                    document.add(new Paragraph("Specialty: " + (doctor != null ? doctor.getSpecialty() : "N/A")));
+                    document.add(new Paragraph("Hospital: " + (doctor != null ? doctor.getHospital() : "N/A")));
+
+                    document.add(new Paragraph("\n"));
+
+                    Paragraph diagnosisTitle = new Paragraph("DIAGNOSIS INFORMATION",
+                            FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+                    document.add(diagnosisTitle);
+                    if (prescription.getDiagnosis() != null) {
+                        document.add(new Paragraph("Diagnosis: " + prescription.getDiagnosis().getDiagnosis()));
+                        document.add(new Paragraph("Symptoms: " + prescription.getDiagnosis().getSymptoms()));
+                        document.add(new Paragraph("Notes: " + prescription.getDiagnosis().getNotes()));
+                    }
+                }
+            }
+
+            document.add(new Paragraph("\n"));
+
+            Paragraph rxTitle = new Paragraph("PRESCRIPTION DETAILS",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+            document.add(rxTitle);
+
+            // Medicines table
+            PdfPTable table = new PdfPTable(3);
+            table.setWidthPercentage(100);
+            
+            PdfPCell cell = new PdfPCell(new Paragraph("Medicines"));
+            cell.setBackgroundColor(new Color(200, 200, 200));
+            table.addCell(cell);
+            
+            cell = new PdfPCell(new Paragraph("Dosage"));
+            cell.setBackgroundColor(new Color(200, 200, 200));
+            table.addCell(cell);
+            
+            cell = new PdfPCell(new Paragraph("Instructions"));
+            cell.setBackgroundColor(new Color(200, 200, 200));
+            table.addCell(cell);
+
+            table.addCell(prescription.getMedicines() != null ? prescription.getMedicines() : "N/A");
+            table.addCell(prescription.getDosage() != null ? prescription.getDosage() : "N/A");
+            table.addCell(prescription.getInstructions() != null ? prescription.getInstructions() : "N/A");
+
+            document.add(table);
+
+            document.add(new Paragraph("\nDuration: " + prescription.getDurationDays() + " days"));
+
+            document.add(new Paragraph("\n\n"));
+            document.add(new Paragraph("Authorized By: _________________________"));
+            document.add(new Paragraph("Date: " + LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+
+            document.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
+    }
+
+    /**
+     * Generate patient report (all diagnoses and prescriptions for a patient)
+     */
+    public byte[] generatePatientReportPDF(Long patientId) {
+        Optional<Patient> patientOpt = patientService.getPatientById(patientId);
+        if (patientOpt.isEmpty()) {
+            return new byte[0];
+        }
+
+        Patient patient = patientOpt.get();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            // Header
+            Paragraph header = new Paragraph("PATIENT MEDICAL REPORT",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20));
+            header.setAlignment(Element.ALIGN_CENTER);
+            document.add(header);
+
+            Paragraph subtitle = new Paragraph("Smart Rural Healthcare System",
+                    FontFactory.getFont(FontFactory.HELVETICA, 12));
+            subtitle.setAlignment(Element.ALIGN_CENTER);
+            document.add(subtitle);
+
+            Paragraph timestamp = new Paragraph("Generated on: " + LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+                    FontFactory.getFont(FontFactory.HELVETICA, 10));
+            timestamp.setAlignment(Element.ALIGN_CENTER);
+            document.add(timestamp);
+
+            document.add(new Paragraph("\n"));
+
+            // Patient Info
+            Paragraph patientTitle = new Paragraph("PATIENT INFORMATION",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+            document.add(patientTitle);
+            document.add(new Paragraph("Name: " + patient.getName()));
+            document.add(new Paragraph("Age: " + patient.getAge()));
+            document.add(new Paragraph("Gender: " + patient.getGender()));
+            document.add(new Paragraph("Village: " + patient.getVillage()));
+            document.add(new Paragraph("Phone: " + patient.getPhone()));
+            document.add(new Paragraph("Diagnosis: " + patient.getDiagnosis()));
+
+            document.add(new Paragraph("\n"));
+
+            // Appointments
+            Paragraph appointmentTitle = new Paragraph("APPOINTMENTS",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+            document.add(appointmentTitle);
+            
+            List<Appointment> appointments = appointmentService.getAllAppointments();
+            if (appointments.isEmpty()) {
+                document.add(new Paragraph("No appointments found."));
+            } else {
+                PdfPTable appointmentTable = new PdfPTable(4);
+                appointmentTable.setWidthPercentage(100);
+                
+                PdfPCell cell = new PdfPCell(new Paragraph("Date"));
+                cell.setBackgroundColor(new Color(200, 200, 200));
+                appointmentTable.addCell(cell);
+                
+                cell = new PdfPCell(new Paragraph("Doctor"));
+                cell.setBackgroundColor(new Color(200, 200, 200));
+                appointmentTable.addCell(cell);
+                
+                cell = new PdfPCell(new Paragraph("Reason"));
+                cell.setBackgroundColor(new Color(200, 200, 200));
+                appointmentTable.addCell(cell);
+                
+                cell = new PdfPCell(new Paragraph("Status"));
+                cell.setBackgroundColor(new Color(200, 200, 200));
+                appointmentTable.addCell(cell);
+
+                for (Appointment apt : appointments) {
+                    if (apt.getPatient() != null && apt.getPatient().getId().equals(patientId)) {
+                        appointmentTable.addCell(apt.getAppointmentDate().toString());
+                        appointmentTable.addCell(apt.getDoctor() != null ? apt.getDoctor().getName() : "N/A");
+                        appointmentTable.addCell(apt.getReason());
+                        appointmentTable.addCell(apt.getStatus().toString());
+                    }
+                }
+                document.add(appointmentTable);
+            }
+
+            document.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
+    }
+
+    /**
+     * Generate medicine inventory report
+     */
+    public byte[] generateInventoryReportPDF() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            Paragraph header = new Paragraph("MEDICINE INVENTORY REPORT",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20));
+            header.setAlignment(Element.ALIGN_CENTER);
+            document.add(header);
+
+            Paragraph timestamp = new Paragraph("Generated on: " + LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+                    FontFactory.getFont(FontFactory.HELVETICA, 10));
+            timestamp.setAlignment(Element.ALIGN_CENTER);
+            document.add(timestamp);
+
+            document.add(new Paragraph("\n"));
+
+            // Inventory Table
+            List<MedicineInventory> medicines = medicineInventoryService.getAllMedicines();
+            if (medicines.isEmpty()) {
+                document.add(new Paragraph("No medicines in inventory."));
+            } else {
+                PdfPTable table = new PdfPTable(6);
+                table.setWidthPercentage(100);
+                
+                String[] headers = {"Medicine Name", "Quantity", "Batch Number", "Expiry Date", "Cost/Unit", "Location"};
+                for (String headerText : headers) {
+                    PdfPCell cell = new PdfPCell(new Paragraph(headerText));
+                    cell.setBackgroundColor(new Color(200, 200, 200));
+                    table.addCell(cell);
+                }
+
+                for (MedicineInventory med : medicines) {
+                    table.addCell(med.getMedicineName());
+                    table.addCell(String.valueOf(med.getQuantity()));
+                    table.addCell(med.getBatchNumber());
+                    table.addCell(med.getExpiryDate());
+                    table.addCell(String.valueOf(med.getCostPerUnit()));
+                    table.addCell(med.getLocation());
+                }
+                document.add(table);
+            }
+
+            document.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
+    }
+}
