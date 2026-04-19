@@ -13,38 +13,48 @@ import com.healthcare.healthcare_system.model.Appointment;
 import com.healthcare.healthcare_system.model.Doctor;
 import com.healthcare.healthcare_system.service.AppointmentService;
 import com.healthcare.healthcare_system.service.DoctorService;
+import com.healthcare.healthcare_system.service.CampScheduleService;
 
 @Controller
 public class PatientDashboardController {
 
     private final DoctorService doctorService;
     private final AppointmentService appointmentService;
+    private final CampScheduleService campScheduleService;
 
-    public PatientDashboardController(DoctorService doctorService, AppointmentService appointmentService) {
+    public PatientDashboardController(
+            DoctorService doctorService,
+            AppointmentService appointmentService,
+            CampScheduleService campScheduleService) {
+
         this.doctorService = doctorService;
         this.appointmentService = appointmentService;
+        this.campScheduleService = campScheduleService;
     }
 
-@GetMapping("/patient-dashboard")
+    @GetMapping("/patient-dashboard")
     @PreAuthorize("hasRole('USER')")
     public String patientDashboard(Model model, Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
         String username = userDetails.getUsername();
 
-        // Fetch doctors
         List<Doctor> doctors = doctorService.getAvailableDoctors();
         model.addAttribute("doctors", doctors);
-        
-        List<Appointment> appointments = appointmentService.getAppointmentsByPatientUsername(username);
+
+        List<Appointment> appointments =
+                appointmentService.getAppointmentsByPatientUsername(username);
+
         model.addAttribute("appointments", appointments);
 
-        // Mock diagnoses, prescriptions - add services later
-        model.addAttribute("diagnoses", List.of());
-        model.addAttribute("prescriptions", List.of());
+        model.addAttribute("camps",
+                campScheduleService.getAllCamps());
+
         model.addAttribute("diagnoses", List.of());
         model.addAttribute("prescriptions", List.of());
 
         return "patient-dashboard";
     }
 }
-

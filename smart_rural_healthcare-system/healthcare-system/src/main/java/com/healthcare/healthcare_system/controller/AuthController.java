@@ -8,13 +8,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.healthcare.healthcare_system.model.User;
+import com.healthcare.healthcare_system.model.Patient;
 import com.healthcare.healthcare_system.service.UserService;
+import com.healthcare.healthcare_system.service.PatientService;
 
 @Controller
 public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PatientService patientService;
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -24,11 +29,36 @@ public class AuthController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, Model model) {
+
         if (userService.findByUsername(user.getUsername()) != null) {
             model.addAttribute("msg", "Username already exists");
             return "register";
         }
+
+        // Save login user account
         userService.saveUser(user);
+
+        // If registered as Patient/User, create patient profile
+        if (user.getRole() == User.Role.USER) {
+
+            if (patientService
+                    .getPatientByUsername(user.getUsername())
+                    .isEmpty()) {
+
+                Patient patient = new Patient();
+
+                patient.setName(user.getName());
+                patient.setAge(0);
+                patient.setGender("Not Provided");
+                patient.setVillage(user.getVillage());
+                patient.setPhone(user.getPhone());
+                patient.setDiagnosis("None");
+                patient.setUsername(user.getUsername());
+
+                patientService.savePatient(patient);
+            }
+        }
+
         model.addAttribute("msg", "Registration successful! Please login.");
         return "register";
     }
@@ -38,4 +68,3 @@ public class AuthController {
         return "login";
     }
 }
-

@@ -3,170 +3,373 @@
 <head>
     <title>Patient Dashboard - Smart Rural Healthcare</title>
     <meta charset="utf-8">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-        .card { border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        #map { height: 400px; border-radius: 10px; }
+        body{
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            min-height:100vh;
+        }
+
+        .card{
+            border-radius:15px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        #map{
+            height:400px;
+            border-radius:10px;
+        }
     </style>
 </head>
+
 <body>
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-    <div class="container mt-5 pt-4">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="text-white mb-4">
-                    <i class="bi bi-heart-pulse"></i> Patient Dashboard
-                </h1>
-            </div>
-        </div>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
-        <!-- Diagnosis & Prescriptions -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card text-dark bg-light">
-                    <div class="card-header">
-                        <h5><i class="bi bi-clipboard-pulse"></i> My Diagnosis</h5>
-                    </div>
-                    <div class="card-body">
-                        <p th:if="${diagnoses.isEmpty()}">No diagnosis records.</p>
-                        <div th:each="diagnosis : ${diagnoses}">
-                            <h6>Symptoms: <span th:text="${diagnosis.symptoms}"></span></h6>
-                            <p>Notes: <span th:text="${diagnosis.notes}"></span></p>
-                            <hr>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card text-dark bg-light">
-                    <div class="card-header">
-                        <h5><i class="bi bi-capsule-pill"></i> My Prescriptions</h5>
-                    </div>
-                    <div class="card-body">
-                        <p th:if="${prescriptions.isEmpty()}">No prescriptions.</p>
-                        <div th:each="prescription : ${prescriptions}">
-                            <h6>Medicines: <span th:text="${prescription.medicines}"></span></h6>
-                            <p>Dosage: <span th:text="${prescription.dosage}"></span> | Duration: <span th:text="${prescription.durationDays}"></span> days</p>
-                            <hr>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container mt-5 pt-4">
 
-        <!-- Appointments -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <div class="card text-dark bg-light">
-                    <div class="card-header">
-                        <h5><i class="bi bi-calendar3"></i> My Appointments</h5>
-                    </div>
-                    <div class="card-body">
-                        <div th:if="${appointments.isEmpty()}">No appointments. <a href="/appointments/new" class="btn btn-primary btn-sm">Make New Appointment</a></div>
-                        <table class="table" th:unless="${appointments.isEmpty()}">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Doctor</th>
-                                    <th>Reason</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="appointment : ${appointments}">
-                                    <td th:text="${appointment.appointmentDate}"></td>
-                                    <td th:text="${appointment.doctor.name}"></td>
-                                    <td th:text="${appointment.reason}"></td>
-                                    <td>Confirmed</td>
-                                    <td>
-                                        <a th:href="@{/appointments/cancel/{id}(id=${appointment.id})}" 
-   class="btn btn-danger btn-sm">
-   Cancel
-</a>
-
-<a th:href="@{/appointments/reschedule/{id}(id=${appointment.id})}" 
-   class="btn btn-warning btn-sm">
-   Reschedule
-</a>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-dark bg-light">
-                    <div class="card-header">
-                        <h5><i class="bi bi-calendar-plus"></i> Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <a href="/appointments/new" class="btn btn-success w-100 mb-2">
-                            <i class="bi bi-plus-circle"></i> Book Appointment
-                        </a>
-                        <a href="/doctors" class="btn btn-info w-100">
-                            <i class="bi bi-people"></i> Find Doctors
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Doctors & Maps -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card text-dark bg-light">
-                    <div class="card-header">
-                        <h5><i class="bi bi-person-heart"></i> Available Doctors</h5>
-                    </div>
-                    <div class="card-body">
-                        <div th:each="doctor : ${doctors}">
-                            <div class="d-flex align-items-center p-3 border-bottom">
-                                <div>
-                                            <h6 th:text="${doctor.name + ' - ' + doctor.specialty}"></h6>
-                                    <small th:text="${doctor.phone}"></small>
-                                </div>
-                                <div class="ms-auto">
-                                            <a th:href="@{/appointments/new(doctorId=${doctor.id})}" class="btn btn-sm btn-primary">Book</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card text-dark bg-light">
-                    <div class="card-header">
-                        <h5><i class="bi bi-geo-alt"></i> Doctor Locations & Camps</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="map"></div>
-                    </div>
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-white mb-4">
+                <i class="bi bi-heart-pulse"></i>
+                Patient Dashboard
+            </h1>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        var map = L.map('map').setView([28.6139, 77.2090], 10);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    <!-- DIAGNOSIS + PRESCRIPTIONS -->
+    <div class="row mb-4">
 
-        // Sample doctor locations (replace with real data)
-        var doctors = [
-            {name: 'Dr. Raj', specialty: 'General', lat: 28.6139, lng: 77.2090, campStart: '2024-04-10 09:00', campEnd: '2024-04-10 17:00'},
-            {name: 'Dr. Priya', specialty: 'Pediatrics', lat: 28.7041, lng: 77.1025, campStart: '2024-04-11 10:00', campEnd: '2024-04-11 16:00'}
-        ];
+        <div class="col-md-6">
+            <div class="card text-dark bg-light">
 
-        doctors.forEach(function(doctor) {
-            L.marker([doctor.lat, doctor.lng]).addTo(map)
-                .bindPopup(doctor.name + ' - ' + doctor.specialty + '<br>Camp: ' + doctor.campStart + ' to ' + doctor.campEnd);
-        });
-    </script>
+                <div class="card-header">
+                    <h5>
+                        <i class="bi bi-clipboard-pulse"></i>
+                        My Diagnosis
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <p th:if="${diagnoses.isEmpty()}">
+                        No diagnosis records.
+                    </p>
+
+                    <div th:each="diagnosis : ${diagnoses}">
+                        <h6>
+                            Symptoms:
+                            <span th:text="${diagnosis.symptoms}"></span>
+                        </h6>
+
+                        <p>
+                            Notes:
+                            <span th:text="${diagnosis.notes}"></span>
+                        </p>
+
+                        <hr>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card text-dark bg-light">
+
+                <div class="card-header">
+                    <h5>
+                        <i class="bi bi-capsule-pill"></i>
+                        My Prescriptions
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <p th:if="${prescriptions.isEmpty()}">
+                        No prescriptions.
+                    </p>
+
+                    <div th:each="prescription : ${prescriptions}">
+
+                        <h6>
+                            Medicines:
+                            <span th:text="${prescription.medicines}"></span>
+                        </h6>
+
+                        <p>
+                            Dosage:
+                            <span th:text="${prescription.dosage}"></span>
+                            |
+                            Duration:
+                            <span th:text="${prescription.durationDays}"></span>
+                            days
+                        </p>
+
+                        <hr>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- APPOINTMENTS -->
+    <div class="row mb-4">
+
+        <div class="col-md-8">
+            <div class="card text-dark bg-light">
+
+                <div class="card-header">
+                    <h5>
+                        <i class="bi bi-calendar3"></i>
+                        My Appointments
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div th:if="${appointments.isEmpty()}">
+                        No appointments.
+                        <a href="/appointments/new"
+                           class="btn btn-primary btn-sm">
+                            Make New Appointment
+                        </a>
+                    </div>
+
+                    <table class="table"
+                           th:unless="${appointments.isEmpty()}">
+
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Doctor</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <tr th:each="appointment : ${appointments}">
+
+                            <td th:text="${appointment.appointmentDate}"></td>
+                            <td th:text="${appointment.doctor.name}"></td>
+                            <td th:text="${appointment.reason}"></td>
+                            <td>Confirmed</td>
+
+                            <td>
+
+                                <a th:href="@{/appointments/cancel/{id}(id=${appointment.id})}"
+                                   class="btn btn-danger btn-sm">
+                                    Cancel
+                                </a>
+
+                                <a th:href="@{/appointments/reschedule/{id}(id=${appointment.id})}"
+                                   class="btn btn-warning btn-sm">
+                                    Reschedule
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-dark bg-light">
+
+                <div class="card-header">
+                    <h5>
+                        <i class="bi bi-calendar-plus"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <a href="/appointments/new"
+                       class="btn btn-success w-100 mb-2">
+                        <i class="bi bi-plus-circle"></i>
+                        Book Appointment
+                    </a>
+
+                    <a href="/doctors"
+                       class="btn btn-info w-100">
+                        <i class="bi bi-people"></i>
+                        Find Doctors
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- UPCOMING CAMPS -->
+    <div class="row mb-4">
+
+        <div class="col-12">
+            <div class="card text-dark bg-light">
+
+                <div class="card-header">
+                    <h5>
+                        <i class="bi bi-calendar-event"></i>
+                        Upcoming Health Camps
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div th:if="${camps.isEmpty()}">
+                        No camps scheduled currently.
+                    </div>
+
+                    <table class="table table-striped"
+                           th:unless="${camps.isEmpty()}">
+
+                        <thead>
+                        <tr>
+                            <th>Village</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <tr th:each="camp : ${camps}">
+                            <td th:text="${camp.village}"></td>
+                            <td th:text="${camp.campDate}"></td>
+                            <td th:text="${camp.startTime + ' - ' + camp.endTime}"></td>
+                            <td th:text="${camp.status}"></td>
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DOCTORS + MAP -->
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="card text-dark bg-light">
+
+                <div class="card-header">
+                    <h5>
+                        <i class="bi bi-person-heart"></i>
+                        Available Doctors
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div th:each="doctor : ${doctors}">
+
+                        <div class="d-flex align-items-center p-3 border-bottom">
+
+                            <div>
+                                <h6 th:text="${doctor.name + ' - ' + doctor.specialty}"></h6>
+                                <small th:text="${doctor.phone}"></small>
+                            </div>
+
+                            <div class="ms-auto">
+                                <a th:href="@{/appointments/new(doctorId=${doctor.id})}"
+                                   class="btn btn-sm btn-primary">
+                                    Book
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card text-dark bg-light">
+
+                <div class="card-header">
+                    <h5>
+                        <i class="bi bi-geo-alt"></i>
+                        Doctor Locations & Camps
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <div id="map"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map').setView([28.6139, 77.2090], 10);
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    ).addTo(map);
+
+    // Temporary sample markers
+    var doctors = [
+        {
+            name:'Dr. Raj',
+            specialty:'General',
+            lat:28.6139,
+            lng:77.2090,
+            campStart:'2024-04-10 09:00',
+            campEnd:'2024-04-10 17:00'
+        },
+        {
+            name:'Dr. Priya',
+            specialty:'Pediatrics',
+            lat:28.7041,
+            lng:77.1025,
+            campStart:'2024-04-11 10:00',
+            campEnd:'2024-04-11 16:00'
+        }
+    ];
+
+    doctors.forEach(function(doctor){
+        L.marker([doctor.lat,doctor.lng]).addTo(map)
+            .bindPopup(
+                doctor.name + ' - ' +
+                doctor.specialty +
+                '<br>Camp: ' +
+                doctor.campStart +
+                ' to ' +
+                doctor.campEnd
+            );
+    });
+</script>
+
 </body>
 </html>
