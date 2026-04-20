@@ -190,48 +190,73 @@ public class ReportService {
             document.add(new Paragraph("Gender: " + patient.getGender()));
             document.add(new Paragraph("Village: " + patient.getVillage()));
             document.add(new Paragraph("Phone: " + patient.getPhone()));
-            document.add(new Paragraph("Diagnosis: " + patient.getDiagnosis()));
 
             document.add(new Paragraph("\n"));
 
-            // Appointments
-            Paragraph appointmentTitle = new Paragraph("APPOINTMENTS",
+            // Appointments with Medical Records
+            Paragraph appointmentTitle = new Paragraph("MEDICAL APPOINTMENTS & RECORDS",
                     FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
             document.add(appointmentTitle);
             
             List<Appointment> appointments = appointmentService.getAllAppointments();
-            if (appointments.isEmpty()) {
+            java.util.List<Appointment> patientAppointments = new java.util.ArrayList<>();
+            
+            for (Appointment apt : appointments) {
+                if (apt.getPatient() != null && apt.getPatient().getId().equals(patientId)) {
+                    patientAppointments.add(apt);
+                }
+            }
+            
+            if (patientAppointments.isEmpty()) {
                 document.add(new Paragraph("No appointments found."));
             } else {
-                PdfPTable appointmentTable = new PdfPTable(4);
-                appointmentTable.setWidthPercentage(100);
-                
-                PdfPCell cell = new PdfPCell(new Paragraph("Date"));
-                cell.setBackgroundColor(new Color(200, 200, 200));
-                appointmentTable.addCell(cell);
-                
-                cell = new PdfPCell(new Paragraph("Doctor"));
-                cell.setBackgroundColor(new Color(200, 200, 200));
-                appointmentTable.addCell(cell);
-                
-                cell = new PdfPCell(new Paragraph("Reason"));
-                cell.setBackgroundColor(new Color(200, 200, 200));
-                appointmentTable.addCell(cell);
-                
-                cell = new PdfPCell(new Paragraph("Status"));
-                cell.setBackgroundColor(new Color(200, 200, 200));
-                appointmentTable.addCell(cell);
-
-                for (Appointment apt : appointments) {
-                    if (apt.getPatient() != null && apt.getPatient().getId().equals(patientId)) {
-                        appointmentTable.addCell(apt.getAppointmentDate().toString());
-                        appointmentTable.addCell(apt.getDoctor() != null ? apt.getDoctor().getName() : "N/A");
-                        appointmentTable.addCell(apt.getReason());
-                        appointmentTable.addCell(apt.getStatus().toString());
+                int appointmentNumber = 1;
+                for (Appointment apt : patientAppointments) {
+                    Paragraph aptHeader = new Paragraph("\n--- Appointment #" + appointmentNumber++ + " ---",
+                            FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11));
+                    document.add(aptHeader);
+                    
+                    document.add(new Paragraph("Date: " + apt.getAppointmentDate()));
+                    document.add(new Paragraph("Doctor: " + (apt.getDoctor() != null ? apt.getDoctor().getName() : "N/A")));
+                    document.add(new Paragraph("Reason: " + apt.getReason()));
+                    document.add(new Paragraph("Status: " + apt.getStatus()));
+                    
+                    // Medical Record Details
+                    if (apt.getMedicalRecord() != null) {
+                        MedicalRecord medRecord = apt.getMedicalRecord();
+                        document.add(new Paragraph(""));
+                        document.add(new Paragraph("Medical Record:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10)));
+                        document.add(new Paragraph("  Record Date: " + (medRecord.getRecordDate() != null ? medRecord.getRecordDate() : "N/A")));
+                        document.add(new Paragraph("  Notes: " + (medRecord.getNotes() != null ? medRecord.getNotes() : "N/A")));
+                        
+                        // Diagnosis
+                        if (medRecord.getDiagnosis() != null) {
+                            Diagnosis diagnosis = medRecord.getDiagnosis();
+                            document.add(new Paragraph(""));
+                            document.add(new Paragraph("Diagnosis:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10)));
+                            document.add(new Paragraph("  Condition: " + (diagnosis.getDiagnosis() != null ? diagnosis.getDiagnosis() : "N/A")));
+                            document.add(new Paragraph("  Symptoms: " + (diagnosis.getSymptoms() != null ? diagnosis.getSymptoms() : "N/A")));
+                            document.add(new Paragraph("  Notes: " + (diagnosis.getNotes() != null ? diagnosis.getNotes() : "N/A")));
+                            
+                            // Prescription
+                            if (diagnosis.getPrescription() != null) {
+                                Prescription prescription = diagnosis.getPrescription();
+                                document.add(new Paragraph(""));
+                                document.add(new Paragraph("Prescription:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10)));
+                                document.add(new Paragraph("  Medicines: " + (prescription.getMedicines() != null ? prescription.getMedicines() : "N/A")));
+                                document.add(new Paragraph("  Dosage: " + (prescription.getDosage() != null ? prescription.getDosage() : "N/A")));
+                                document.add(new Paragraph("  Instructions: " + (prescription.getInstructions() != null ? prescription.getInstructions() : "N/A")));
+                                document.add(new Paragraph("  Duration: " + prescription.getDurationDays() + " days"));
+                            }
+                        }
                     }
                 }
-                document.add(appointmentTable);
             }
+
+            document.add(new Paragraph("\n\n"));
+            document.add(new Paragraph("Authorized By: _________________________"));
+            document.add(new Paragraph("Date: " + LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
 
             document.close();
             return baos.toByteArray();
