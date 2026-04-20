@@ -80,6 +80,7 @@
                                         <th>Date</th>
                                         <th>Reason</th>
                                         <th>Status</th>
+                                        <th>Rx</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -95,6 +96,17 @@
                                             <span th:if="${appointment.status == 'APPROVED'}" class="badge bg-success">APPROVED</span>
                                             <span th:if="${appointment.status == 'REJECTED'}" class="badge bg-danger">REJECTED</span>
                                             <span th:if="${appointment.status == 'CANCELLED'}" class="badge bg-secondary">CANCELLED</span>
+                                        </td>
+                                        <td>
+                                            <th:block th:if="${appointment.medicalRecord?.diagnosis != null}">
+                                                <a th:href="@{/prescription/create/{diagnosisId}(diagnosisId=${appointment.medicalRecord.diagnosis.id})}" 
+                                                   class="btn btn-sm btn-success">
+                                                    <i class="bi bi-capsule-pill"></i> Add
+                                                </a>
+                                            </th:block>
+                                            <th:block th:if="${appointment.medicalRecord?.diagnosis == null}">
+                                                <span class="text-muted">-</span>
+                                            </th:block>
                                         </td>
                                     </tr>
                                 </tbody>

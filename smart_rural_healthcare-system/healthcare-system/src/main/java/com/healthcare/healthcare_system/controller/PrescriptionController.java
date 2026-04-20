@@ -13,9 +13,11 @@ import com.healthcare.healthcare_system.service.DiagnosisService;
 import com.healthcare.healthcare_system.service.PrescriptionService;
 import com.healthcare.healthcare_system.service.MedicineInventoryService;
 import com.healthcare.healthcare_system.service.AppointmentService;
+import com.healthcare.healthcare_system.repository.MedicalRecordRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping("/prescription")
@@ -32,6 +34,9 @@ public class PrescriptionController {
 
     @Autowired
     private AppointmentService appointmentService;
+
+    @Autowired
+    private MedicalRecordRepository medicalRecordRepository;
 
     @GetMapping("/list")
     public String listPrescriptions(Model model) {
@@ -154,24 +159,41 @@ public class PrescriptionController {
         if (appointment == null) {
             return "redirect:/appointments";
         }
-        
-        // Create diagnosis first if not exists
-        Diagnosis diagnosis = new Diagnosis();
+
+        MedicalRecord medicalRecord = appointment.getMedicalRecord();
+        if (medicalRecord == null) {
+            medicalRecord = new MedicalRecord();
+            medicalRecord.setAppointment(appointment);
+            medicalRecord.setRecordDate(LocalDateTime.now());
+            medicalRecord.setNotes("Prescription created from appointment view");
+            medicalRecord = medicalRecordRepository.save(medicalRecord);
+            appointment.setMedicalRecord(medicalRecord);
+        } else if (medicalRecord.getRecordDate() == null) {
+            medicalRecord.setRecordDate(LocalDateTime.now());
+            medicalRecord = medicalRecordRepository.save(medicalRecord);
+        }
+
+        Diagnosis diagnosis = medicalRecord.getDiagnosis();
+        if (diagnosis == null) {
+            diagnosis = new Diagnosis();
+            diagnosis.setMedicalRecord(medicalRecord);
+        }
         diagnosis.setDiagnosis("From Appointment ID: " + appointmentId);
         diagnosis.setSymptoms("To be documented");
         diagnosis.setNotes("Prescription created from appointment view");
         diagnosis = diagnosisService.createDiagnosis(diagnosis);
 
-        // Create prescription
-        Prescription prescription = new Prescription();
-        prescription.setDiagnosis(diagnosis);
+        Prescription prescription = diagnosis.getPrescription();
+        if (prescription == null) {
+            prescription = new Prescription();
+            prescription.setDiagnosis(diagnosis);
+        }
         prescription.setMedicines(medicines);
         prescription.setDosage(dosage);
         prescription.setInstructions(instructions);
         prescription.setDurationDays(durationDays);
-        
         prescription = prescriptionService.createPrescription(prescription);
-        
+
         return "redirect:/prescription/view/" + prescription.getId();
     }
 }

@@ -104,21 +104,29 @@
 
                     <div th:each="prescription : ${prescriptions}">
 
-                        <h6>
-                            Medicines:
-                            <span th:text="${prescription.medicines}"></span>
-                        </h6>
+                        <div class="alert alert-info">
+                            <h6 class="mb-2">
+                                <i class="bi bi-capsule-pill"></i>
+                                <strong>Medicines:</strong> <span th:text="${prescription.medicines}"></span>
+                            </h6>
 
-                        <p>
-                            Dosage:
-                            <span th:text="${prescription.dosage}"></span>
-                            |
-                            Duration:
-                            <span th:text="${prescription.durationDays}"></span>
-                            days
-                        </p>
+                            <p class="mb-2">
+                                <strong>Dosage:</strong> <span th:text="${prescription.dosage}"></span>
+                            </p>
 
-                        <hr>
+                            <p class="mb-2">
+                                <strong>Instructions:</strong> <span th:text="${prescription.instructions}"></span>
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Duration:</strong> <span th:text="${prescription.durationDays}"></span> days
+                            </p>
+
+                            <p th:if="${prescription.diagnosis}" class="mb-0">
+                                <strong>Diagnosis:</strong> <span th:text="${prescription.diagnosis.diagnosis}"></span>
+                            </p>
+                        </div>
+
                     </div>
 
                 </div>

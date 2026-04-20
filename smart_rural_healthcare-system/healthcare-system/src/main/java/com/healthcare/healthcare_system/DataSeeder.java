@@ -15,6 +15,13 @@ import com.healthcare.healthcare_system.repository.PatientRepository;
 import com.healthcare.healthcare_system.repository.UserRepository;
 import com.healthcare.healthcare_system.model.CampSchedule;
 import com.healthcare.healthcare_system.repository.CampScheduleRepository;
+import com.healthcare.healthcare_system.model.MedicalRecord;
+import com.healthcare.healthcare_system.model.Diagnosis;
+import com.healthcare.healthcare_system.model.Prescription;
+import com.healthcare.healthcare_system.model.Status;
+import com.healthcare.healthcare_system.repository.MedicalRecordRepository;
+import com.healthcare.healthcare_system.repository.DiagnosisRepository;
+import com.healthcare.healthcare_system.repository.PrescriptionRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -26,13 +33,19 @@ public class DataSeeder implements CommandLineRunner {
     private final PatientRepository patientRepository;
     private final AppointmentRepository appointmentRepository;
     private final CampScheduleRepository campScheduleRepository;
+    private final MedicalRecordRepository medicalRecordRepository;
+    private final DiagnosisRepository diagnosisRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
-    public DataSeeder(UserRepository userRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, AppointmentRepository appointmentRepository, CampScheduleRepository campScheduleRepository) {
+    public DataSeeder(UserRepository userRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, AppointmentRepository appointmentRepository, CampScheduleRepository campScheduleRepository, MedicalRecordRepository medicalRecordRepository, DiagnosisRepository diagnosisRepository, PrescriptionRepository prescriptionRepository) {
         this.userRepository = userRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
         this.appointmentRepository = appointmentRepository;
         this.campScheduleRepository = campScheduleRepository;
+        this.medicalRecordRepository = medicalRecordRepository;
+        this.diagnosisRepository = diagnosisRepository;
+        this.prescriptionRepository = prescriptionRepository;
     }
 
     @Override
@@ -132,9 +145,38 @@ healthworker.setPassword("$2a$10$N9Qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL
             apt1.setReason("Checkup");
             apt1.setDoctor(doctor1);
             apt1.setPatient(patient1);
+            apt1.setStatus(Status.APPROVED);
             appointmentRepository.save(apt1);
 
-            System.out.println("✅ Seed data loaded: 4 users, 2 doctors, 1 patient, 1 appointment");
+            // 8. Medical Records with Diagnosis and Prescriptions
+            MedicalRecord medRecord = new MedicalRecord();
+            medRecord.setAppointment(apt1);
+            medRecord.setRecordDate(LocalDateTime.now());
+            medRecord.setNotes("Patient was diagnosed with High Blood Pressure. Advised to reduce salt intake and regular exercise.");
+            medicalRecordRepository.save(medRecord);
+
+            // 9. Diagnosis
+            Diagnosis diagnosis = new Diagnosis();
+            diagnosis.setMedicalRecord(medRecord);
+            diagnosis.setDiagnosis("Hypertension (High Blood Pressure)");
+            diagnosis.setSymptoms("Headaches, dizziness, occasional fatigue");
+            diagnosis.setNotes("BP readings: 150/95 mm Hg - Grade 1 Hypertension detected");
+            diagnosisRepository.save(diagnosis);
+
+            // 10. Prescription
+            Prescription prescription = new Prescription();
+            prescription.setDiagnosis(diagnosis);
+            prescription.setMedicines("Amlodipine 5mg, Metoprolol 50mg");
+            prescription.setDosage("Amlodipine: 1 tablet daily in morning, Metoprolol: 1 tablet twice daily");
+            prescription.setInstructions("Take with water after meals. Do not skip doses. Monitor BP daily if possible.");
+            prescription.setDurationDays(30);
+            prescriptionRepository.save(prescription);
+
+            // Update appointment with medical record
+            apt1.setMedicalRecord(medRecord);
+            appointmentRepository.save(apt1);
+
+            System.out.println("✅ Seed data loaded: 4 users, 2 doctors, 1 patient, 1 appointment with complete medical records");
         }
     }
 }
