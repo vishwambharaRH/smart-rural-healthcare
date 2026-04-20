@@ -11,11 +11,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.healthcare.healthcare_system.config.CustomUserDetails;
 import com.healthcare.healthcare_system.model.Appointment;
 import com.healthcare.healthcare_system.model.Doctor;
+import com.healthcare.healthcare_system.model.Diagnosis;
+import com.healthcare.healthcare_system.model.Prescription;
 import com.healthcare.healthcare_system.service.AppointmentService;
 import com.healthcare.healthcare_system.service.DoctorService;
 import com.healthcare.healthcare_system.service.CampScheduleService;
 import com.healthcare.healthcare_system.service.ReportService;
 import com.healthcare.healthcare_system.service.PatientService;
+import com.healthcare.healthcare_system.service.DiagnosisService;
+import com.healthcare.healthcare_system.service.PrescriptionService;
 import com.healthcare.healthcare_system.model.Patient;
 import com.healthcare.healthcare_system.model.Appointment;
 import org.springframework.http.HttpHeaders;
@@ -30,20 +34,28 @@ public class PatientDashboardController {
 
     private final DoctorService doctorService;
     private final AppointmentService appointmentService;
-private final CampScheduleService campScheduleService;
+    private final CampScheduleService campScheduleService;
     private final ReportService reportService;
     private final PatientService patientService;
+    private final DiagnosisService diagnosisService;
+    private final PrescriptionService prescriptionService;
 
     public PatientDashboardController(
             DoctorService doctorService,
             AppointmentService appointmentService,
-CampScheduleService campScheduleService, ReportService reportService, PatientService patientService) {
+            CampScheduleService campScheduleService, 
+            ReportService reportService, 
+            PatientService patientService,
+            DiagnosisService diagnosisService,
+            PrescriptionService prescriptionService) {
 
         this.doctorService = doctorService;
         this.appointmentService = appointmentService;
         this.campScheduleService = campScheduleService;
         this.reportService = reportService;
         this.patientService = patientService;
+        this.diagnosisService = diagnosisService;
+        this.prescriptionService = prescriptionService;
     }
 
     @GetMapping("/patient-dashboard")
@@ -66,8 +78,24 @@ CampScheduleService campScheduleService, ReportService reportService, PatientSer
         model.addAttribute("camps",
                 campScheduleService.getAllCamps());
 
-        model.addAttribute("diagnoses", List.of());
-        model.addAttribute("prescriptions", List.of());
+        // Fetch diagnoses and prescriptions from completed appointments
+        List<Diagnosis> diagnoses = new java.util.ArrayList<>();
+        List<Prescription> prescriptions = new java.util.ArrayList<>();
+        
+        for (Appointment appointment : appointments) {
+            if (appointment.getMedicalRecord() != null) {
+                Diagnosis diagnosis = appointment.getMedicalRecord().getDiagnosis();
+                if (diagnosis != null) {
+                    diagnoses.add(diagnosis);
+                    if (diagnosis.getPrescription() != null) {
+                        prescriptions.add(diagnosis.getPrescription());
+                    }
+                }
+            }
+        }
+        
+        model.addAttribute("diagnoses", diagnoses);
+        model.addAttribute("prescriptions", prescriptions);
 
         return "patient-dashboard";
     }
@@ -99,9 +127,7 @@ CampScheduleService campScheduleService, ReportService reportService, PatientSer
 
         Optional<Patient> patientOpt = patientService.getPatientByUsername(username);
         if (patientOpt.isPresent()) {
-            // Note: For all prescriptions, could loop single PDFs but use patient report for simplicity
-            byte[] pdfBytes = reportService.generateInventoryReportPDF(); // Reuse or extend for prescriptions
-            // TODO: Implement multi-prescription PDF if needed
+            byte[] pdfBytes = reportService.generatePatientPrescriptionsListPDF(patientOpt.get().getId());
             if (pdfBytes.length > 0) {
                 response.setContentType("application/pdf");
                 response.setHeader("Content-Disposition", "attachment; filename=\"prescriptions.pdf\"");

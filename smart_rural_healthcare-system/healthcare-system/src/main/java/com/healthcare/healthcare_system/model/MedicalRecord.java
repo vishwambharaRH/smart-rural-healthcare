@@ -24,7 +24,7 @@ public class MedicalRecord {
 
     private String notes;
 
-    @OneToOne(mappedBy = "medicalRecord", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "medicalRecord", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Diagnosis diagnosis;
 }
 

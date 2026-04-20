@@ -10,14 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.healthcare.healthcare_system.model.Doctor;
 import com.healthcare.healthcare_system.service.AppointmentService;
 import com.healthcare.healthcare_system.service.DoctorService;
-import com.healthcare.healthcare_system.service.MedicineInventoryService;
 import com.healthcare.healthcare_system.service.PatientService;
 
 @Controller
 public class DoctorDashboardController {
-
-    @Autowired
-    private MedicineInventoryService medicineInventoryService;
 
     @Autowired
     private PatientService patientService;
@@ -34,7 +30,6 @@ public class DoctorDashboardController {
         
         String username = authentication.getName();
         
-        model.addAttribute("medicines", medicineInventoryService.getAllMedicines());
         model.addAttribute("patients", patientService.getAllPatients());
         Doctor doctor = doctorService.getDoctorByUsername(username);
         model.addAttribute("doctor", doctor);

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,8 +25,6 @@ import lombok.NoArgsConstructor;
 public class Appointment {
     
 
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,18 +39,14 @@ public class Appointment {
 
     private LocalDateTime appointmentDate;
 
+    private String reason;
 
-private String reason;
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.PENDING;
 
-@Enumerated(EnumType.STRING)
-private Status status = Status.PENDING;
-
-@OneToOne(mappedBy = "appointment")
-private MedicalRecord medicalRecord;
-
+    @OneToOne(mappedBy = "appointment", fetch = FetchType.EAGER)
+    private MedicalRecord medicalRecord;
 }
-
-
 
 
 

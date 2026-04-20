@@ -298,4 +298,112 @@ public class ReportService {
             return new byte[0];
         }
     }
+
+    /**
+     * Generate patient prescriptions list PDF
+     */
+    public byte[] generatePatientPrescriptionsListPDF(Long patientId) {
+        Optional<Patient> patientOpt = patientService.getPatientById(patientId);
+        if (patientOpt.isEmpty()) {
+            return new byte[0];
+        }
+
+        Patient patient = patientOpt.get();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            // Header
+            Paragraph header = new Paragraph("PATIENT PRESCRIPTIONS",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20));
+            header.setAlignment(Element.ALIGN_CENTER);
+            document.add(header);
+
+            Paragraph subtitle = new Paragraph("Smart Rural Healthcare System",
+                    FontFactory.getFont(FontFactory.HELVETICA, 12));
+            subtitle.setAlignment(Element.ALIGN_CENTER);
+            document.add(subtitle);
+
+            Paragraph timestamp = new Paragraph("Generated on: " + LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+                    FontFactory.getFont(FontFactory.HELVETICA, 10));
+            timestamp.setAlignment(Element.ALIGN_CENTER);
+            document.add(timestamp);
+
+            document.add(new Paragraph("\n"));
+
+            // Patient Info
+            Paragraph patientTitle = new Paragraph("PATIENT INFORMATION",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+            document.add(patientTitle);
+            document.add(new Paragraph("Name: " + patient.getName()));
+            document.add(new Paragraph("Age: " + patient.getAge()));
+            document.add(new Paragraph("Gender: " + patient.getGender()));
+            document.add(new Paragraph("Village: " + patient.getVillage()));
+            document.add(new Paragraph("Phone: " + patient.getPhone()));
+
+            document.add(new Paragraph("\n"));
+
+            // Prescriptions
+            Paragraph prescriptionTitle = new Paragraph("PRESCRIPTIONS",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12));
+            document.add(prescriptionTitle);
+
+            List<Appointment> appointments = appointmentService.getAllAppointments();
+            List<Prescription> patientPrescriptions = new java.util.ArrayList<>();
+
+            for (Appointment apt : appointments) {
+                if (apt.getPatient() != null && apt.getPatient().getId().equals(patientId) 
+                        && apt.getMedicalRecord() != null 
+                        && apt.getMedicalRecord().getDiagnosis() != null
+                        && apt.getMedicalRecord().getDiagnosis().getPrescription() != null) {
+                    patientPrescriptions.add(apt.getMedicalRecord().getDiagnosis().getPrescription());
+                }
+            }
+
+            if (patientPrescriptions.isEmpty()) {
+                document.add(new Paragraph("No prescriptions found for this patient."));
+            } else {
+                int prescriptionNumber = 1;
+                for (Prescription prescription : patientPrescriptions) {
+                    Paragraph prescNum = new Paragraph("\nPrescription #" + prescriptionNumber++,
+                            FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11));
+                    document.add(prescNum);
+
+                    if (prescription.getDiagnosis() != null && prescription.getDiagnosis().getMedicalRecord() != null) {
+                        Appointment apt = prescription.getDiagnosis().getMedicalRecord().getAppointment();
+                        if (apt != null && apt.getDoctor() != null) {
+                            document.add(new Paragraph("Doctor: " + apt.getDoctor().getName()));
+                            document.add(new Paragraph("Date: " + apt.getAppointmentDate()));
+                        }
+                    }
+
+                    document.add(new Paragraph("Medicines: " + (prescription.getMedicines() != null ? prescription.getMedicines() : "N/A")));
+                    document.add(new Paragraph("Dosage: " + (prescription.getDosage() != null ? prescription.getDosage() : "N/A")));
+                    document.add(new Paragraph("Instructions: " + (prescription.getInstructions() != null ? prescription.getInstructions() : "N/A")));
+                    document.add(new Paragraph("Duration: " + prescription.getDurationDays() + " days"));
+
+                    if (prescription.getDiagnosis() != null) {
+                        document.add(new Paragraph("Diagnosis: " + prescription.getDiagnosis().getDiagnosis()));
+                    }
+
+                    document.add(new Paragraph("-------------------------------------------"));
+                }
+            }
+
+            document.add(new Paragraph("\n\n"));
+            document.add(new Paragraph("Authorized By: _________________________"));
+            document.add(new Paragraph("Date: " + LocalDateTime.now()
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+
+            document.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
+    }
 }

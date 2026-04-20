@@ -23,7 +23,7 @@ public class Diagnosis {
     private String diagnosis;
     private String notes;
 
-    @OneToOne(mappedBy = "diagnosis", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "diagnosis", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Prescription prescription;
 }
 

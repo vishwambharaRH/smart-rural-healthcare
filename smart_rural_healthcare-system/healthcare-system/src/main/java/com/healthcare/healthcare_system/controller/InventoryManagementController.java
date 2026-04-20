@@ -1,6 +1,7 @@
 package com.healthcare.healthcare_system.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class InventoryManagementController {
     private MedicineInventoryService medicineInventoryService;
 
     @GetMapping("/dashboard")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String inventoryDashboard(Model model) {
         List<MedicineInventory> allMedicines = medicineInventoryService.getAllMedicines();
         List<MedicineInventory> lowStockMedicines = medicineInventoryService.getLowStockMedicines(10);
@@ -32,6 +34,7 @@ public class InventoryManagementController {
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String listMedicines(Model model) {
         List<MedicineInventory> medicines = medicineInventoryService.getAllMedicines();
         model.addAttribute("medicines", medicines);
@@ -39,6 +42,7 @@ public class InventoryManagementController {
     }
 
     @GetMapping("/view/{id}")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String viewMedicine(@PathVariable Long id, Model model) {
         Optional<MedicineInventory> medicine = medicineInventoryService.getMedicineById(id);
         if (medicine.isPresent()) {
@@ -49,12 +53,14 @@ public class InventoryManagementController {
     }
 
     @GetMapping("/create")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String createMedicineForm(Model model) {
         model.addAttribute("medicine", new MedicineInventory());
         return "inventory-create";
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String createMedicine(
             @RequestParam String medicineName,
             @RequestParam String batchNumber,
@@ -77,6 +83,7 @@ public class InventoryManagementController {
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String editMedicineForm(@PathVariable Long id, Model model) {
         Optional<MedicineInventory> medicine = medicineInventoryService.getMedicineById(id);
         if (medicine.isPresent()) {
@@ -87,6 +94,7 @@ public class InventoryManagementController {
     }
 
     @PostMapping("/edit/{id}")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String editMedicine(
             @PathVariable Long id,
             @RequestParam String medicineName,
@@ -114,6 +122,7 @@ public class InventoryManagementController {
     }
 
     @PostMapping("/use/{id}")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String useMedicine(
             @PathVariable Long id,
             @RequestParam Integer quantity) {
@@ -126,6 +135,7 @@ public class InventoryManagementController {
     }
 
     @PostMapping("/add-stock/{id}")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String addStock(
             @PathVariable Long id,
             @RequestParam Integer quantity) {
@@ -138,12 +148,14 @@ public class InventoryManagementController {
     }
 
     @PostMapping("/delete/{id}")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String deleteMedicine(@PathVariable Long id) {
         medicineInventoryService.deleteMedicine(id);
         return "redirect:/inventory/list";
     }
 
     @GetMapping("/low-stock")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String lowStockMedicines(Model model) {
         List<MedicineInventory> lowStockMedicines = medicineInventoryService.getLowStockMedicines(10);
         model.addAttribute("medicines", lowStockMedicines);
@@ -151,6 +163,7 @@ public class InventoryManagementController {
     }
 
     @GetMapping("/by-specialty/{specialty}")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String medicinesBySpecialty(@PathVariable String specialty, Model model) {
         List<MedicineInventory> medicines = medicineInventoryService.getMedicinesBySpecialty(specialty);
         model.addAttribute("medicines", medicines);
@@ -159,6 +172,7 @@ public class InventoryManagementController {
     }
 
     @GetMapping("/by-location/{location}")
+    @PreAuthorize("hasRole('HEALTHWORKER')")
     public String medicinesByLocation(@PathVariable String location, Model model) {
         List<MedicineInventory> medicines = medicineInventoryService.getMedicinesForVillage(location, 0);
         model.addAttribute("medicines", medicines);
